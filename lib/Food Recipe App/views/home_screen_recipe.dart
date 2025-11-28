@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ui_practices/Food%20Recipe%20App/colors/colors.dart';
+import 'package:ui_practices/Food%20Recipe%20App/models/categories_recipe.dart';
 import 'package:ui_practices/Food%20Recipe%20App/models/recipe_model.dart';
 
 class HomeScreenRecipe extends StatefulWidget {
@@ -11,104 +12,275 @@ class HomeScreenRecipe extends StatefulWidget {
 
 class _HomeScreenRecipeState extends State<HomeScreenRecipe> {
   int selectedIndex = 0;
+  int selectedIndexBottomNav = 0;
+  void _onItemTapped(int index) {
+    setState(() {
+      selectedIndexBottomNav = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: recipeAppBackgroundColor,
       body: SafeArea(
-        child: Column(
+        child: ListView(
           children: [
             headerParts(),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             mySearchField(),
-            SizedBox(height: 30),
-            rowSectionPopular(),
-            SizedBox(height: 20),
+            const SizedBox(height: 30),
+            rowSectionDivider('Popular menus', 'See all'),
+            const SizedBox(height: 20),
             popularMenuItems(),
-            SizedBox(height: 20),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: List.generate(recipeItems.length, (index) {
-                  final recipe = recipeItems[index];
+            const SizedBox(height: 20),
 
-                  return Padding(
-                    padding: index == 0
-                        ? EdgeInsetsGeometry.only(left: 20, right: 10)
-                        : EdgeInsetsGeometry.only(right: 10),
-                    child: GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        height: 250,
-                        width: MediaQuery.of(context).size.width / 2.45,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          image: DecorationImage(
-                            image: AssetImage(recipe.image),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              margin: EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: recipe.fav ? Colors.red : Colors.black45,
-                              ),
-                              child: Icon(
-                                Icons.favorite_border_outlined,
-                                color: Colors.white,
-                                size: 18,
-                              ),
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.black45,
-                              ),
-                              child: Column(
-                                children: [
-                                  Text(
-                                    recipe.name,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                }),
+            // MAIN CARD LIST
+            recipeImageCard(context),
+            const SizedBox(height: 20),
+            rowSectionDivider('Categories', 'See all'),
+            const SizedBox(height: 10),
+            categoryItems(),
+            const SizedBox(height: 10),
+            chefInformationDetails(),
+            const SizedBox(height: 10),
+          ],
+        ),
+      ),
+      bottomNavigationBar: bottomNavBar(),
+    );
+  }
+
+  BottomNavigationBar bottomNavBar() {
+    return BottomNavigationBar(
+      items: <BottomNavigationBarItem>[
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.bar_chart_rounded),
+          label: 'Business',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.favorite_border_outlined),
+          label: 'Favoriates',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person_outline_rounded),
+          label: 'Favoriates',
+        ),
+      ],
+      currentIndex: selectedIndexBottomNav,
+      unselectedItemColor: Colors.black87,
+      selectedItemColor: Colors.green[400],
+      onTap: _onItemTapped,
+
+      showUnselectedLabels: true,
+    );
+  }
+
+  Padding chefInformationDetails() {
+    return Padding(
+      padding: EdgeInsetsGeometry.all(40),
+      child: Row(
+        children: [
+          Container(
+            height: 40,
+            width: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              image: DecorationImage(
+                image: NetworkImage(
+                  'https://media.istockphoto.com/id/1213660289/photo/young-beautiful-chinese-chef-woman-wearing-cooker-uniform-and-hat-holding-tray-with-dome-with.jpg?s=612x612&w=0&k=20&c=Acr3SpWXvGhElDWXTo2Z7hfc7jpUQrXJuOs9SzuZEHA=',
+                ),
+                fit: BoxFit.cover,
               ),
             ),
-          ],
+          ),
+          SizedBox(width: 20),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Hona Ci Minh',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                'Expert Chef',
+                style: TextStyle(color: Colors.black.withValues(alpha: 0.5)),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  SingleChildScrollView categoryItems() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: List.generate(
+          recipeCategory.length,
+          (index) => Padding(
+            padding: index == 0
+                ? EdgeInsetsGeometry.only(left: 20, right: 20)
+                : EdgeInsetsGeometry.only(right: 20),
+            child: Column(
+              children: [
+                CircleAvatar(
+                  radius: 33,
+                  backgroundColor: recipeCategory[index].color,
+                  child: Image.asset(
+                    recipeCategory[index].image,
+                    fit: BoxFit.cover,
+                    height: 40,
+                    width: 40,
+                  ),
+                ),
+                SizedBox(height: 5),
+                Text(
+                  recipeCategory[index].name,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 
-  Padding rowSectionPopular() {
+  SizedBox recipeImageCard(BuildContext context) {
+    return SizedBox(
+      height: 250,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: List.generate(recipeItems.length, (index) {
+            final recipe = recipeItems[index];
+
+            return Padding(
+              padding: index == 0
+                  ? const EdgeInsets.only(left: 20, right: 10)
+                  : const EdgeInsets.only(right: 10),
+              child: GestureDetector(
+                onTap: () {},
+                child: Container(
+                  height: 300,
+                  width: MediaQuery.of(context).size.width / 2.45,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    image: DecorationImage(
+                      image: AssetImage(recipe.image),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      /// ⬆️Top FAV BUTTON
+                      Container(
+                        padding: const EdgeInsets.all(5),
+                        margin: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: recipe.fav ? Colors.red : Colors.black38,
+                        ),
+                        child: Icon(
+                          Icons.favorite_border_outlined,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                      ),
+
+                      /// 🔽 This pushes bottom content to bottom cleanly
+                      const Spacer(),
+
+                      /// 🔽 Bottom Info Box
+                      Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.black45,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    recipe.name,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.star,
+                                      color: Colors.amberAccent,
+                                      size: 18,
+                                    ),
+                                    Text(
+                                      "${recipe.rate}",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 3),
+                            Text(
+                              "1 Bow(${recipe.weight}g)",
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                              ),
+                            ),
+                            SizedBox(height: 3),
+                            Text(
+                              "${recipe.calorie} Kkal | 25% AKL",
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }),
+        ),
+      ),
+    );
+  }
+
+  // 🔵 Popular Text Row
+  Padding rowSectionDivider(String leftText, String rightText) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'Popular menus',
+            leftText,
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           Text(
-            'See all',
+            rightText,
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -120,6 +292,7 @@ class _HomeScreenRecipeState extends State<HomeScreenRecipe> {
     );
   }
 
+  // 🔵 Menu Filter Buttons
   SingleChildScrollView popularMenuItems() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -127,15 +300,16 @@ class _HomeScreenRecipeState extends State<HomeScreenRecipe> {
         children: List.generate(
           menuItems.length,
           (index) => Padding(
-            padding: EdgeInsets.only(left: 20),
+            padding: const EdgeInsets.only(left: 20),
             child: GestureDetector(
               onTap: () {
-                setState(() {
-                  selectedIndex = index;
-                });
+                setState(() => selectedIndex = index);
               },
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 7),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 15,
+                  vertical: 7,
+                ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   gradient: LinearGradient(
@@ -165,15 +339,16 @@ class _HomeScreenRecipeState extends State<HomeScreenRecipe> {
     );
   }
 
+  // 🔵 Search Bar
   Padding mySearchField() {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           color: searchBarColor,
         ),
-        child: TextFormField(
+        child: const TextField(
           decoration: InputDecoration(
             border: InputBorder.none,
             prefixIcon: Icon(Icons.search, color: Colors.black45),
@@ -186,17 +361,18 @@ class _HomeScreenRecipeState extends State<HomeScreenRecipe> {
     );
   }
 
+  // 🔵 Header Section
   Padding headerParts() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(15),
       child: Row(
         children: [
-          Text.rich(
+          const Text.rich(
             TextSpan(
               children: [
                 TextSpan(
                   text: "Hello Peter,\n",
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 TextSpan(
                   text: "What do you want to eat today?",
@@ -205,12 +381,11 @@ class _HomeScreenRecipeState extends State<HomeScreenRecipe> {
               ],
             ),
           ),
-          Spacer(),
+          const Spacer(),
           Stack(
             children: [
-              CircleAvatar(
+              const CircleAvatar(
                 radius: 20,
-                backgroundColor: Colors.white,
                 backgroundImage: NetworkImage(
                   'https://thumbs.dreamstime.com/b/profile-picture-caucasian-male-employee-posing-office-happy-young-worker-look-camera-workplace-headshot-portrait-smiling-190186649.jpg',
                 ),
@@ -220,11 +395,11 @@ class _HomeScreenRecipeState extends State<HomeScreenRecipe> {
                 top: 1,
                 child: Container(
                   height: 9,
-                  width: 9.0,
+                  width: 9,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white),
                     color: Colors.green,
+                    border: Border.all(color: Colors.white),
                   ),
                 ),
               ),
