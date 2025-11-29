@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ui_practices/Food%20Recipe%20App/colors/colors.dart';
 import 'package:ui_practices/Food%20Recipe%20App/models/categories_recipe.dart';
 import 'package:ui_practices/Food%20Recipe%20App/models/recipe_model.dart';
+import 'package:ui_practices/Food%20Recipe%20App/views/items_detail_screen.dart';
 
 class HomeScreenRecipe extends StatefulWidget {
   const HomeScreenRecipe({super.key});
@@ -47,7 +48,13 @@ class _HomeScreenRecipeState extends State<HomeScreenRecipe> {
           ],
         ),
       ),
-      bottomNavigationBar: bottomNavBar(),
+      bottomNavigationBar: ClipRRect(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30.0),
+          topRight: Radius.circular(30.0),
+        ),
+        child: bottomNavBar(),
+      ),
     );
   }
 
@@ -69,10 +76,11 @@ class _HomeScreenRecipeState extends State<HomeScreenRecipe> {
         ),
       ],
       currentIndex: selectedIndexBottomNav,
-      unselectedItemColor: Colors.black87,
-      selectedItemColor: Colors.green[400],
+      // unselectedItemColor: Colors.black87,
+      selectedItemColor: Colors.green,
       onTap: _onItemTapped,
-
+      backgroundColor: Colors.grey.shade100, // Set the background color here
+      type: BottomNavigationBarType.fixed,
       showUnselectedLabels: true,
     );
   }
@@ -171,7 +179,15 @@ class _HomeScreenRecipeState extends State<HomeScreenRecipe> {
                   ? const EdgeInsets.only(left: 20, right: 10)
                   : const EdgeInsets.only(right: 10),
               child: GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ItemsDetailScreen(recipeItems: recipe),
+                    ),
+                  );
+                },
                 child: Container(
                   height: 300,
                   width: MediaQuery.of(context).size.width / 2.45,
