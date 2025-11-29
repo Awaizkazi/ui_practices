@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ui_practices/Food%20Recipe%20App/views/recipe_onboarding.dart';
 
 void main() {
+  
   runApp(const MyApp());
 }
 

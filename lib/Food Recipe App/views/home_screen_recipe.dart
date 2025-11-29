@@ -126,44 +126,44 @@ class _HomeScreenRecipeState extends State<HomeScreenRecipe> {
     );
   }
 
-  SingleChildScrollView categoryItems() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: List.generate(
-          recipeCategory.length,
-          (index) => Padding(
-            padding: index == 0
-                ? EdgeInsetsGeometry.only(left: 20, right: 20)
-                : EdgeInsetsGeometry.only(right: 20),
-            child: Column(
-              children: [
-                CircleAvatar(
-                  radius: 33,
-                  backgroundColor: recipeCategory[index].color,
-                  child: Image.asset(
-                    recipeCategory[index].image,
-                    fit: BoxFit.cover,
-                    height: 40,
-                    width: 40,
+    SingleChildScrollView categoryItems() {
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: List.generate(
+            recipeCategory.length,
+            (index) => Padding(
+              padding: index == 0
+                  ? EdgeInsetsGeometry.only(left: 20, right: 20)
+                  : EdgeInsetsGeometry.only(right: 20),
+              child: Column(
+                children: [
+                  CircleAvatar(
+                    radius: 33,
+                    backgroundColor: recipeCategory[index].color,
+                    child: Image.asset(
+                      recipeCategory[index].image,
+                      fit: BoxFit.cover,
+                      height: 40,
+                      width: 40,
+                    ),
                   ),
-                ),
-                SizedBox(height: 5),
-                Text(
-                  recipeCategory[index].name,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                  SizedBox(height: 5),
+                  Text(
+                    recipeCategory[index].name,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
-  }
+      );
+    }
 
   SizedBox recipeImageCard(BuildContext context) {
     return SizedBox(

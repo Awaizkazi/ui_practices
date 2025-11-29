@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:ui_practices/Food%20Recipe%20App/models/ingredients.dart';
 import 'package:ui_practices/Food%20Recipe%20App/models/recipe_model.dart';
 
 class ItemsDetailScreen extends StatefulWidget {
@@ -53,7 +55,7 @@ class _ItemsDetailScreenState extends State<ItemsDetailScreen> {
                   ),
                   color: Colors.white,
                 ),
-                padding: EdgeInsets.symmetric(horizontal: 20),
+                padding: EdgeInsets.symmetric(horizontal: 15),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -134,7 +136,7 @@ class _ItemsDetailScreenState extends State<ItemsDetailScreen> {
                         Column(
                           children: [
                             Text(
-                              "${widget.recipeItems.name}",
+                              widget.recipeItems.name,
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
@@ -164,8 +166,44 @@ class _ItemsDetailScreenState extends State<ItemsDetailScreen> {
                     SizedBox(height: 30),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [],
+                      children: [
+                        MyProgressIndicatorValue(
+                          name: 'Carbs',
+                          amount: "${widget.recipeItems.carb} g",
+                          percentage: "(56%)",
+                          color: Colors.green,
+                          data: 0.4,
+                        ),
+                        MyProgressIndicatorValue(
+                          name: 'Fat',
+                          amount: "${widget.recipeItems.fat} g",
+                          percentage: "(72%)",
+                          color: Colors.red,
+                          data: 0.6,
+                        ),
+                        MyProgressIndicatorValue(
+                          name: 'Protein',
+                          amount: "${widget.recipeItems.carb} g",
+                          percentage: "(8%)",
+                          color: Colors.orange,
+                          data: 0.2,
+                        ),
+                        MyProgressIndicatorValue(
+                          color: Colors.green,
+                          name: 'Calories',
+                          amount: '${widget.recipeItems.calorie} kkal',
+                          percentage: "",
+                          data: 0.7,
+                        ),
+                      ],
                     ),
+                    SizedBox(height: 20),
+                    rowSectionDivider(
+                      leftText: 'Ingredients',
+                      rightText: 'See Details',
+                    ),
+                    SizedBox(height: 20),
+                    ingredientsItems(),
                   ],
                 ),
               ),
@@ -201,27 +239,62 @@ class _ItemsDetailScreenState extends State<ItemsDetailScreen> {
       ),
     );
   }
+}
 
-  // 🔵 Popular Text Row
-  Padding rowSectionDivider(String leftText, String rightText) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            leftText,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+class MyProgressIndicatorValue extends StatelessWidget {
+  final String? name, amount;
+  final String percentage;
+  final Color color;
+  final double data;
+  const MyProgressIndicatorValue({
+    super.key,
+    required this.name,
+    required this.amount,
+    required this.percentage,
+    required this.color,
+    required this.data,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return CircularPercentIndicator(
+      radius: 20,
+      circularStrokeCap: CircularStrokeCap.round,
+      percent: data,
+      lineWidth: 7,
+      reverse: true,
+      backgroundColor: color.withOpacity(0.2),
+      animation: true,
+      animationDuration: 500,
+      restartAnimation: true,
+      progressColor: color,
+      header: Padding(
+        padding: const EdgeInsets.only(bottom: 5),
+        child: Text(
+          name!,
+          style: TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 12),
+        ),
+      ),
+      footer: Padding(
+        padding: const EdgeInsets.only(top: 5),
+        child: RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: '$amount ',
+                style: const TextStyle(color: Colors.black, fontSize: 12),
+              ),
+              TextSpan(
+                text: percentage,
+                style: TextStyle(
+                  color: color,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+              ),
+            ],
           ),
-          Text(
-            rightText,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Colors.green,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -240,4 +313,67 @@ class MyClipper extends CustomClipper<Path> {
 
   @override
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+// 🔵 Popular Text Row
+Padding rowSectionDivider({String? leftText, String? rightText}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 5),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          leftText!,
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        Text(
+          rightText ?? '',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Colors.green,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+SingleChildScrollView ingredientsItems() {
+  return SingleChildScrollView(
+    scrollDirection: Axis.horizontal,
+    child: Row(
+      children: List.generate(
+        ingredients.length,
+        (index) => Padding(
+          padding: index == 0
+              ? EdgeInsetsGeometry.only(left: 20, right: 10)
+              : EdgeInsetsGeometry.only(right: 20),
+          child: Column(
+            children: [
+              CircleAvatar(
+                radius: 30,
+                backgroundColor: ingredients[index].color,
+                child: Image.asset(
+                  ingredients[index].image,
+                  fit: BoxFit.cover,
+                  height: 40,
+                  width: 40,
+                ),
+              ),
+              SizedBox(height: 5),
+              Text(
+                ingredients[index].name,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
 }
